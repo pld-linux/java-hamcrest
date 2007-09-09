@@ -1,0 +1,13 @@
+--- hamcrest-1.1/build.xml.orig	2007-06-30 15:03:43.000000000 +0200
++++ hamcrest-1.1/build.xml	2007-09-09 10:34:00.195647224 +0200
+@@ -251,10 +251,6 @@
+                 </classpath>
+             </javac>
+             <copy file="LICENSE.txt" todir="build/temp/@{destjar}.contents"/>
+-            <!-- Put Java source in Jars for user's convenience. -->
+-            <copy todir="build/temp/@{destjar}.contents">
+-                <fileset dir="@{srcdir}"/>
+-            </copy>
+             <jar jarfile="@{destjar}">
+                 <fileset dir="build/temp/@{destjar}.contents"/>
+             </jar>
