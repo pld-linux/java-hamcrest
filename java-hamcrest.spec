@@ -5,6 +5,12 @@
 # Conditional build:
 %bcond_without tests	# don't perform ant unit-test
 #
+%if "%{pld_release}" == "ti"
+%bcond_without	java_sun	# build with gcj
+%else
+%bcond_with	java_sun	# build with java-sun
+%endif
+#
 %include	/usr/lib/rpm/macros.java
 Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
@@ -16,17 +22,21 @@ Group:		Development/Languages/Java
 Source0:	http://hamcrest.googlecode.com/files/%{name}-%{version}.tgz
 # Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
 Patch0:		%{name}-nosrc.patch
+Patch1:		%{name}-target.patch
 URL:		http://code.google.com/p/hamcrest/
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
-BuildRequires:	jdk >= 1.5
+%{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
+%{?with_tests:BuildRequires:	java-junit}
+BuildRequires:	java-qdox
+%{?with_java_sun:BuildRequires:	java-sun >= 1.5}
 BuildRequires:	jpackage-utils
-%{?with_tests:BuildRequires:	junit}
+BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpmbuild(macros) >= 1.300
 Requires:	jpackage-utils
+Requires:	java-qdox
 BuildArch:	noarch
-ExclusiveArch:	i586 i686 pentium3 pentium4 athlon %{x8664} noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -52,11 +62,14 @@ Dokumentacja javadoc do hamcresta.
 %prep
 %setup -q
 %patch0 -p1
+#%%patch1 -p1
 
 rm -f lib/integration/junit*
 
 %build
 export JAVA_HOME="%{java_home}"
+
+CLASSPATH=$(find-jar qdox)
 
 %ant bigjar \
 	-Dversion=%{version}
