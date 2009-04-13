@@ -65,14 +65,24 @@ Dokumentacja javadoc do hamcresta.
 %setup -q -n %{srcname}-%{version}
 %patch0 -p1
 
-rm -f lib/integration/junit*
+rm -vf *.jar
+rm -vf lib/integration/junit-*.jar
+rm -vf lib/generator/qdox-*.jar
+
+# TODO: add new property (with this default value) do be override with -D
+# TODO: add build.properties support to build.xml
+%{__sed} -i -e 's,lib/generator/qdox-1.6.1.jar,${qdox.jar},g' build.xml
 
 %build
 export JAVA_HOME="%{java_home}"
 
 CLASSPATH=$(find-jar qdox)
+cat <<EOF > build.properties
+qdox.jar=$(find-jar qdox)
+EOF
 
-%ant bigjar \
+%ant core generator library text integration \
+	-Dqdox.jar=$(find-jar qdox) \
 	-Dversion=%{version}
 
 %if 0
@@ -90,9 +100,9 @@ CLASSPATH=$(find-jar qdox)
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_javadir}
 
-for f in all core generator integration library text ; do
-	install build/hamcrest-${f}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
-	ln -sf hamcrest-${f}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/hamcrest-${f}.jar
+for f in core generator integration library text; do
+	cp -a build/hamcrest-$f-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
+	ln -sf hamcrest-$f-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/hamcrest-$f.jar
 done
 
 %if 0
@@ -111,12 +121,7 @@ ln -nfs %{srcname}-%{version} %{_javadocdir}/%{srcname}
 %files
 %defattr(644,root,root,755)
 %doc CHANGES.txt LICENSE.txt README.txt
-%{_javadir}/hamcrest-all*.jar
-%{_javadir}/hamcrest-core*.jar
-%{_javadir}/hamcrest-generator*.jar
-%{_javadir}/hamcrest-integration*.jar
-%{_javadir}/hamcrest-library*.jar
-%{_javadir}/hamcrest-text*.jar
+%{_javadir}/*.jar
 
 %if 0
 %files javadoc
