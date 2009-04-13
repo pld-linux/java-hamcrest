@@ -1,6 +1,7 @@
 # TODO:
 # - use more systen packages? (jarjar, lib/integration/*)
 # - build javadoc (now it fails)
+# - does not build with gcj.
 #
 # Conditional build:
 %bcond_without tests	# don't perform ant unit-test
@@ -24,7 +25,6 @@ Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
 # Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
 Patch0:		%{srcname}-nosrc.patch
-Patch1:		%{srcname}-target.patch
 URL:		http://code.google.com/p/hamcrest/
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
@@ -64,7 +64,6 @@ Dokumentacja javadoc do hamcresta.
 %prep
 %setup -q -n %{srcname}-%{version}
 %patch0 -p1
-#%%patch1 -p1
 
 rm -f lib/integration/junit*
 
