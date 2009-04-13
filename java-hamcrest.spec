@@ -12,21 +12,24 @@
 %endif
 #
 %include	/usr/lib/rpm/macros.java
+
+%srcname	hamcrest
 Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
-Name:		hamcrest
+Name:		java-hamcrest
 Version:	1.1
 Release:	0.1
 License:	BSD
 Group:		Development/Languages/Java
-Source0:	http://hamcrest.googlecode.com/files/%{name}-%{version}.tgz
+Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
 # Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
-Patch0:		%{name}-nosrc.patch
-Patch1:		%{name}-target.patch
+Patch0:		%{srcname}-nosrc.patch
+Patch1:		%{srcname}-target.patch
 URL:		http://code.google.com/p/hamcrest/
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
 %{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
+%{?with_java_sun:BuildRequires:	java-sun}
 %{?with_tests:BuildRequires:	java-junit}
 BuildRequires:	java-qdox
 %{?with_java_sun:BuildRequires:	java-sun >= 1.5}
@@ -74,9 +77,11 @@ CLASSPATH=$(find-jar qdox)
 %ant bigjar \
 	-Dversion=%{version}
 
+%if 0
 # doesn't build
-#%ant javadoc \
-#	-Dversion=%{version}
+%ant javadoc \
+	-Dversion=%{version}
+%endif
 
 %if %{with tests}
 %ant unit-test \
@@ -92,16 +97,18 @@ for f in all core generator integration library text ; do
 	ln -sf hamcrest-${f}-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/hamcrest-${f}.jar
 done
 
+%if 0
 # javadoc
-#install -d $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-#cp -a dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{name}-%{version}
-#ln -s %{name}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{name} # ghost symlink
+install -d $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
+cp -a dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
+ln -s %{srcname}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{srcname} # ghost symlink
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
 %post javadoc
-ln -nfs %{name}-%{version} %{_javadocdir}/%{name}
+ln -nfs %{srcname}-%{version} %{_javadocdir}/%{srcname}
 
 %files
 %defattr(644,root,root,755)
@@ -113,7 +120,9 @@ ln -nfs %{name}-%{version} %{_javadocdir}/%{name}
 %{_javadir}/hamcrest-library*.jar
 %{_javadir}/hamcrest-text*.jar
 
-#%files javadoc
-#%defattr(644,root,root,755)
-#%{_javadocdir}/%{name}-%{version}
-#%ghost %{_javadocdir}/%{name}
+%if 0
+%files javadoc
+%defattr(644,root,root,755)
+%{_javadocdir}/%{srcname}-%{version}
+%ghost %{_javadocdir}/%{srcname}
+%endif
