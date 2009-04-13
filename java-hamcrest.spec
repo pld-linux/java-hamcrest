@@ -62,7 +62,7 @@ Javadoc manual for hamcrest.
 Dokumentacja javadoc do hamcresta.
 
 %prep
-%setup -q
+%setup -q -n %{srcname}-%{version}
 %patch0 -p1
 #%%patch1 -p1
 
