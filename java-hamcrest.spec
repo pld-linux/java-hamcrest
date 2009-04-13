@@ -1,5 +1,5 @@
 # TODO:
-# - use more systen packages? (qdox, jarjar, lib/integration/*)
+# - use more systen packages? (jarjar, lib/integration/*)
 # - build javadoc (now it fails)
 #
 # Conditional build:
@@ -13,14 +13,14 @@
 #
 %include	/usr/lib/rpm/macros.java
 
-%srcname	hamcrest
+%define		srcname	hamcrest
 Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
 Version:	1.1
 Release:	0.1
 License:	BSD
-Group:		Development/Languages/Java
+Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
 # Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
 Patch0:		%{srcname}-nosrc.patch
@@ -29,7 +29,6 @@ URL:		http://code.google.com/p/hamcrest/
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
 %{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
-%{?with_java_sun:BuildRequires:	java-sun}
 %{?with_tests:BuildRequires:	java-junit}
 BuildRequires:	java-qdox
 %{?with_java_sun:BuildRequires:	java-sun >= 1.5}
