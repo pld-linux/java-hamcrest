@@ -1,37 +1,47 @@
 # TODO:
-# - use more systen packages? (jarjar, lib/integration/*)
+# - use more system packages? (jarjar, lib/integration/*)
 # - build javadoc (now it fails)
 # - does not build with gcj.
 #
 # Conditional build:
-%bcond_without tests	# don't perform ant unit-test
+%bcond_with	javadoc		# don't build javadoc
+%bcond_without	tests		# don't build and run tests
+%bcond_with 	binary		# do not compile .jars from source use bundled ones
 #
 %if "%{pld_release}" == "ti"
 %bcond_without	java_sun	# build with gcj
 %else
-%bcond_with	java_sun	# build with java-sun
+%bcond_without	java_sun	# build with java-sun
 %endif
-#
-%include	/usr/lib/rpm/macros.java
+
+# HACK: use binary where java-sun not available
+%ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
+%define	with_binary	1
+%endif
 
 %define		srcname	hamcrest
+%include	/usr/lib/rpm/macros.java
 Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
 Version:	1.1
-Release:	1
+Release:	2
 License:	BSD
 Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
 # Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
+Source1:	http://hamcrest.googlecode.com/files/%{srcname}-text-%{version}.jar
+# Source1-md5:	6267206d906192119a8e9770f7e2ed65
 Patch0:		%{srcname}-nosrc.patch
 URL:		http://code.google.com/p/hamcrest/
+%if %{without binary}
+%{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
+%{?with_java_sun:BuildRequires:	java-sun >= 1.5}
+%endif
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
-%{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
 %{?with_tests:BuildRequires:	java-junit}
 BuildRequires:	java-qdox
-%{?with_java_sun:BuildRequires:	java-sun >= 1.5}
 BuildRequires:	jpackage-utils
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-javaprov
@@ -65,9 +75,15 @@ Dokumentacja javadoc do hamcresta.
 %setup -q -n %{srcname}-%{version}
 %patch0 -p1
 
-rm -vf *.jar
 rm -vf lib/integration/junit-*.jar
 rm -vf lib/generator/qdox-*.jar
+
+%if %{with binary}
+# hamcrest-text somewhy missing in jar
+cp -a %{SOURCE1} .
+%else
+rm -vf *.jar
+%endif
 
 # TODO: add new property (with this default value) do be override with -D
 # TODO: add build.properties support to build.xml
@@ -76,23 +92,31 @@ rm -vf lib/generator/qdox-*.jar
 %build
 export JAVA_HOME="%{java_home}"
 
-CLASSPATH=$(find-jar qdox)
+qdox_jar=$(find-jar qdox)
+CLASSPATH=$qdox_jar
 cat <<EOF > build.properties
-qdox.jar=$(find-jar qdox)
+qdox.jar=$qdox_jar
 EOF
 
+%if %{with binary}
+install -d build
+cp -af *.jar build
+%else
 %ant core generator library text integration \
-	-Dqdox.jar=$(find-jar qdox) \
+	-Dqdox.jar=$qdox_jar \
 	-Dversion=%{version}
+%endif
 
-%if 0
+%if %{with javadoc}
 # doesn't build
 %ant javadoc \
+	-Dqdox.jar=$qdox_jar \
 	-Dversion=%{version}
 %endif
 
 %if %{with tests}
 %ant unit-test \
+	-Dqdox.jar=$qdox_jar \
 	-Dversion=%{version}
 %endif
 
@@ -105,7 +129,7 @@ for f in core generator integration library text; do
 	ln -sf hamcrest-$f-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/hamcrest-$f.jar
 done
 
-%if 0
+%if %{with javadoc}
 # javadoc
 install -d $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
 cp -a dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
@@ -123,7 +147,7 @@ ln -nfs %{srcname}-%{version} %{_javadocdir}/%{srcname}
 %doc CHANGES.txt LICENSE.txt README.txt
 %{_javadir}/*.jar
 
-%if 0
+%if %{with javadoc}
 %files javadoc
 %defattr(644,root,root,755)
 %{_javadocdir}/%{srcname}-%{version}
