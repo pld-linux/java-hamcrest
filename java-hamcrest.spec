@@ -94,16 +94,16 @@ rm -vf *.jar
 %build
 export JAVA_HOME="%{java_home}"
 
+%if %{with binary}
+install -d build
+cp -af *.jar build
+%else
 qdox_jar=$(find-jar qdox)
 CLASSPATH=$qdox_jar
 cat <<EOF > build.properties
 qdox.jar=$qdox_jar
 EOF
 
-%if %{with binary}
-install -d build
-cp -af *.jar build
-%else
 %ant core generator library text integration \
 	-Dqdox.jar=$qdox_jar \
 	-Dversion=%{version}
