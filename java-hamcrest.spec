@@ -7,16 +7,16 @@
 %bcond_with	javadoc		# don't build javadoc
 %bcond_without	tests		# don't build and run tests
 %bcond_with 	binary		# do not compile .jars from source use bundled ones
-#
+%bcond_with	bootstrap	# break BR loop (java-junit, java-qdox)
+
 %if "%{pld_release}" == "ti"
 %bcond_without	java_sun	# build with gcj
 %else
 %bcond_without	java_sun	# build with java-sun
 %endif
 
-# HACK: use binary where java-sun not available
-%ifnarch i586 i686 pentium3 pentium4 athlon %{x8664}
-%define	with_binary	1
+%if %{with bootstrap}
+%define		with_binary	1
 %endif
 
 %define		srcname	hamcrest
@@ -25,7 +25,7 @@ Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
 Version:	1.1
-Release:	2
+Release:	2%{?with_bootstrap:.bootstrap}
 License:	BSD
 Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
