@@ -37,11 +37,11 @@ URL:		http://code.google.com/p/hamcrest/
 %if %{without binary}
 %{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
 %{?with_java_sun:BuildRequires:	java-sun >= 1.5}
-%endif
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
 %{?with_tests:BuildRequires:	java-junit}
 BuildRequires:	java-qdox
+%endif
 BuildRequires:	jpackage-utils
 BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-javaprov
