@@ -17,6 +17,8 @@
 
 %if %{with bootstrap}
 %define		with_binary	1
+%undefine	with_tests
+%undefine	with_javadoc
 %endif
 
 %define		srcname	hamcrest
