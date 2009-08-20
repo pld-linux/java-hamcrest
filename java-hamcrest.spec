@@ -27,7 +27,7 @@ Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
 Version:	1.1
-Release:	2%{?with_bootstrap:.bootstrap}
+Release:	3%{?with_bootstrap:.bootstrap}
 License:	BSD
 Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
