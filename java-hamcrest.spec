@@ -9,12 +9,6 @@
 %bcond_with 	binary		# do not compile .jars from source use bundled ones
 %bcond_with	bootstrap	# break BR loop (java-junit, java-qdox)
 
-%if "%{pld_release}" == "ti"
-%bcond_without	java_sun	# build with gcj
-%else
-%bcond_without	java_sun	# build with java-sun
-%endif
-
 %if %{with bootstrap}
 %define		with_binary	1
 %undefine	with_tests
@@ -27,7 +21,7 @@ Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
 Version:	1.1
-Release:	3%{?with_bootstrap:.bootstrap}
+Release:	3
 License:	BSD
 Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
@@ -37,19 +31,17 @@ Source1:	http://hamcrest.googlecode.com/files/%{srcname}-text-%{version}.jar
 Patch0:		%{srcname}-nosrc.patch
 URL:		http://code.google.com/p/hamcrest/
 %if %{without binary}
-%{!?with_java_sun:BuildRequires:	java-gcj-compat-devel}
-%{?with_java_sun:BuildRequires:	java-sun >= 1.5}
 BuildRequires:	ant >= 1.6
 %{?with_tests:BuildRequires:	ant-junit >= 1.6}
 %{?with_tests:BuildRequires:	java-junit}
 BuildRequires:	java-qdox
+BuildRequires:	jdk
 %endif
 BuildRequires:	jpackage-utils
-BuildRequires:	rpm >= 4.4.9-56
 BuildRequires:	rpm-javaprov
 BuildRequires:	rpmbuild(macros) >= 1.300
-Requires:	jpackage-utils
 Requires:	java-qdox
+Requires:	jpackage-utils
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
