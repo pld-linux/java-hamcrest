@@ -4,9 +4,9 @@
 # - does not build with gcj.
 #
 # Conditional build:
-%bcond_with	javadoc		# don't build javadoc
-%bcond_without	tests		# don't build and run tests
-%bcond_with 	binary		# do not compile .jars from source use bundled ones
+%bcond_with	javadoc		# build javadoc
+%bcond_with	tests		# build and run tests (tests are broken)
+%bcond_with binary		# do not compile .jars from source use bundled ones
 %bcond_with	bootstrap	# break BR loop (java-junit, java-qdox)
 
 %if %{with bootstrap}
@@ -15,19 +15,18 @@
 %undefine	with_javadoc
 %endif
 
+%define		rel	1
 %define		srcname	hamcrest
 %include	/usr/lib/rpm/macros.java
 Summary:	Hamcrest - a library of matchers
 Summary(pl.UTF-8):	Hamcrest - biblioteka klas dopasowujących
 Name:		java-hamcrest
-Version:	1.1
-Release:	3
+Version:	1.2
+Release:	%{bootstrap_release %rel}
 License:	BSD
 Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
-# Source0-md5:	1bd4fd301c1a0dc748082378a59cb281
-Source1:	http://hamcrest.googlecode.com/files/%{srcname}-text-%{version}.jar
-# Source1-md5:	6267206d906192119a8e9770f7e2ed65
+# Source0-md5:	b4bd43f44d082d77daf7ec564d304cdf
 Patch0:		%{srcname}-nosrc.patch
 URL:		http://code.google.com/p/hamcrest/
 %if %{without binary}
@@ -39,7 +38,7 @@ BuildRequires:	jdk
 %endif
 BuildRequires:	jpackage-utils
 BuildRequires:	rpm-javaprov
-BuildRequires:	rpmbuild(macros) >= 1.300
+BuildRequires:	rpmbuild(macros) >= 1.557
 Requires:	java-qdox
 Requires:	jpackage-utils
 BuildArch:	noarch
@@ -67,15 +66,12 @@ Dokumentacja javadoc do hamcresta.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p1
+%patch0 -p0
 
 rm -vf lib/integration/junit-*.jar
 rm -vf lib/generator/qdox-*.jar
 
-%if %{with binary}
-# hamcrest-text somewhy missing in jar
-cp -a %{SOURCE1} .
-%else
+%if %{without binary}
 rm -vf *.jar
 %endif
 
@@ -96,7 +92,7 @@ cat <<EOF > build.properties
 qdox.jar=$qdox_jar
 EOF
 
-%ant core generator library text integration \
+%ant core generator library integration \
 	-Dqdox.jar=$qdox_jar \
 	-Dversion=%{version}
 %endif
@@ -118,7 +114,7 @@ EOF
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_javadir}
 
-for f in core generator integration library text; do
+for f in core generator integration library; do
 	cp -a build/hamcrest-$f-%{version}.jar $RPM_BUILD_ROOT%{_javadir}
 	ln -sf hamcrest-$f-%{version}.jar $RPM_BUILD_ROOT%{_javadir}/hamcrest-$f.jar
 done
