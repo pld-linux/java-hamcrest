@@ -15,7 +15,7 @@
 %undefine	with_javadoc
 %endif
 
-%define		rel	1
+%define		rel	2
 %define		srcname	hamcrest
 %include	/usr/lib/rpm/macros.java
 Summary:	Hamcrest - a library of matchers
@@ -71,7 +71,7 @@ Dokumentacja javadoc do hamcresta.
 Summary:	Source code of %{srcname}
 Summary(pl.UTF-8):	Kod źródłowy %{srcname}
 Group:		Documentation
-Requires:	jpackage-utils >= 1.555
+Requires:	jpackage-utils >= 1.7.5-2
 
 %description source
 Source code of %{srcname}.
