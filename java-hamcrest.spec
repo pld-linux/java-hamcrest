@@ -4,7 +4,7 @@
 # - does not build with gcj.
 #
 # Conditional build:
-%bcond_with	javadoc		# build javadoc
+%bcond_without	javadoc		# build javadoc
 %bcond_with	tests		# build and run tests (tests are broken)
 %bcond_with binary		# do not compile .jars from source use bundled ones
 %bcond_with	bootstrap	# break BR loop (java-junit, java-qdox)
@@ -28,6 +28,7 @@ Group:		Libraries/Java
 Source0:	http://hamcrest.googlecode.com/files/%{srcname}-%{version}.tgz
 # Source0-md5:	b4bd43f44d082d77daf7ec564d304cdf
 Patch0:		%{srcname}-nosrc.patch
+Patch1:		javadoc-build.patch
 URL:		http://code.google.com/p/hamcrest/
 %if %{without binary}
 BuildRequires:	ant >= 1.6
@@ -64,9 +65,22 @@ Javadoc manual for hamcrest.
 %description javadoc -l pl.UTF-8
 Dokumentacja javadoc do hamcresta.
 
+%package source
+Summary:	Source code of %{srcname}
+Summary(pl.UTF-8):	Kod źródłowy %{srcname}
+Group:		Documentation
+Requires:	jpackage-utils >= 1.555
+
+%description source
+Source code of %{srcname}.
+
+%description source -l pl.UTF-8
+Kod źródłowy %{srcname}.
+
 %prep
 %setup -q -n %{srcname}-%{version}
 %patch0 -p0
+%patch1 -p0
 
 rm -vf lib/integration/junit-*.jar
 rm -vf lib/generator/qdox-*.jar
@@ -110,6 +124,13 @@ EOF
 	-Dversion=%{version}
 %endif
 
+# source
+%jar cf %{srcname}.src.jar -C build/temp/hamcrest-library/generated-code .
+%jar uf %{srcname}.src.jar -C build/temp/hamcrest-core/generated-code .
+for I in examples integration library generator core; do
+	%jar uf %{srcname}.src.jar -C hamcrest-$I/src/main/java .
+done
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_javadir}
@@ -122,9 +143,13 @@ done
 %if %{with javadoc}
 # javadoc
 install -d $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
-cp -a dist/docs/api/* $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
+cp -a build/javadoc/* $RPM_BUILD_ROOT%{_javadocdir}/%{srcname}-%{version}
 ln -s %{srcname}-%{version} $RPM_BUILD_ROOT%{_javadocdir}/%{srcname} # ghost symlink
 %endif
+
+#source
+install -d $RPM_BUILD_ROOT%{_javasrcdir}
+cp -a %{srcname}.src.jar $RPM_BUILD_ROOT%{_javasrcdir}/%{srcname}.src.jar
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -143,3 +168,7 @@ ln -nfs %{srcname}-%{version} %{_javadocdir}/%{srcname}
 %{_javadocdir}/%{srcname}-%{version}
 %ghost %{_javadocdir}/%{srcname}
 %endif
+
+%files source
+%defattr(644,root,root,755)
+%{_javasrcdir}/%{srcname}.src.jar
