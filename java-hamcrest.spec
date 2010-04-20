@@ -42,6 +42,7 @@ BuildRequires:	rpm-javaprov
 BuildRequires:	rpmbuild(macros) >= 1.557
 Requires:	java-qdox
 Requires:	jpackage-utils
+Obsoletes:	hamcrest
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -58,6 +59,7 @@ Summary:	Javadoc manual for hamcrest
 Summary(pl.UTF-8):	Dokumentacja javadoc do hamcresta
 Group:		Documentation
 Requires:	jpackage-utils
+Obsoletes:	hamcrest-javadoc
 
 %description javadoc
 Javadoc manual for hamcrest.
