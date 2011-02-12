@@ -6,7 +6,7 @@
 # Conditional build:
 %bcond_without	javadoc		# build javadoc
 %bcond_with	tests		# build and run tests (tests are broken)
-%bcond_with binary		# do not compile .jars from source use bundled ones
+%bcond_with	binary		# do not compile .jars from source use bundled ones
 %bcond_with	bootstrap	# break BR loop (java-junit, java-qdox)
 
 %if %{with bootstrap}
@@ -68,27 +68,27 @@ Javadoc manual for hamcrest.
 Dokumentacja javadoc do hamcresta.
 
 %package source
-Summary:	Source code of %{srcname}
-Summary(pl.UTF-8):	Kod źródłowy %{srcname}
+Summary:	Source code of hamcrest
+Summary(pl.UTF-8):	Kod źródłowy biblioteki hamcrest
 Group:		Documentation
 Requires:	jpackage-utils >= 1.7.5-2
 
 %description source
-Source code of %{srcname}.
+Source code of hamcrest.
 
 %description source -l pl.UTF-8
-Kod źródłowy %{srcname}.
+Kod źródłowy biblioteki hamcrest.
 
 %prep
 %setup -q -n %{srcname}-%{version}
 %patch0 -p0
 %patch1 -p0
 
-rm -vf lib/integration/junit-*.jar
-rm -vf lib/generator/qdox-*.jar
+%{__rm} lib/integration/junit-*.jar
+%{__rm} lib/generator/qdox-*.jar
 
 %if %{without binary}
-rm -vf *.jar
+%{__rm} *.jar
 %endif
 
 # TODO: add new property (with this default value) do be override with -D
@@ -162,7 +162,14 @@ ln -nfs %{srcname}-%{version} %{_javadocdir}/%{srcname}
 %files
 %defattr(644,root,root,755)
 %doc CHANGES.txt LICENSE.txt README.txt
-%{_javadir}/*.jar
+%{_javadir}/hamcrest-core-%{version}.jar
+%{_javadir}/hamcrest-core.jar
+%{_javadir}/hamcrest-generator-%{version}.jar
+%{_javadir}/hamcrest-generator.jar
+%{_javadir}/hamcrest-integration-%{version}.jar
+%{_javadir}/hamcrest-integration.jar
+%{_javadir}/hamcrest-library-%{version}.jar
+%{_javadir}/hamcrest-library.jar
 
 %if %{with javadoc}
 %files javadoc
