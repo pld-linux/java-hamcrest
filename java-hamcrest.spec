@@ -80,8 +80,8 @@ Kod źródłowy biblioteki hamcrest.
 
 %prep
 %setup -q -n %{srcname}-%{version}
-%patch0 -p0
-%patch1 -p0
+%patch -P0 -p0
+%patch -P1 -p0
 
 %{__rm} lib/integration/junit-*.jar
 %{__rm} lib/generator/qdox-*.jar
